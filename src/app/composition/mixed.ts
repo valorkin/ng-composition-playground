@@ -2,123 +2,61 @@
 // 1. Mixins inherit only methods and properties
 
 // This can live anywhere in your codebase:
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChange, SimpleChanges, Type } from '@angular/core';
-import { combineLatest, Subject } from 'rxjs';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import { filter } from 'rxjs/operators';
+import { OnChanges$, OnDestroy$, OnInit$ } from '../ng-composition/lifecycle';
+import { mixture } from '../ng-composition/pure-mixture';
 
-// Each mixin is a traditional ES class
-class Jumpable {
-  _jump = 1;
+// todo:
+// 1. combine latest
+// 2. watch | watchers
+// 3. this?
+// 4. convert onChange to key\value pairs?
+// 5* ignore Class is using Angular features but is not decorated. Please add an explicit Angular decorator.
+// 6. inject parts via DI
+// 7. how to init all the things??? setup function
+// 7.1. child provides properties and methods without dependencies
+// 7.2. child provides props and methods with dependencies
+// 8. Component API should be defined in place - I prefer to be a bit more conservative about it,
+// 8> for documentation and typing purposes
+// 9. typeahead matching and highlight example
+// 10. expose properties\methods to template?
+// 11. computed properties
 
-  get jumpy() {
-    return this._jump;
-  }
+// Steps:
+// 0. Perspective on component as an API and documentation for interactions:
+// DO
+// -- @Inputs - parent to child
+// -- properties - rendering
+// -- @Output - child to parent
+// -- methods event handlers
+// DO NOT (composition or NOT)
+// -- zero usage of getters and methods in templates
+// -- zero async pipe usage in templates
+// prefer
+// 1. use mixture for observable lifecycles
+// 2. inject features, use setup method to inject {props, methods, calculated properties}
+// 3. implement interfaces from features, to have properties, methods available in templates
 
-  jump() {
-    this._jump++;
-  }
-}
+const mixtureClass = mixture(OnDestroy$, OnInit$, OnChanges$);
+interface test {temp: number}
 
-class Duckable {
-  _duck = 1;
-
-  duck() {
-    this._duck++;
-  }
-}
-
-// Apply the mixins into the base class via
-// the JS at runtime
-
-class EmptyClass {
-}
-
-// function mixture<T1 extends EmptyClass,
-//   T2 extends EmptyClass>(constructors: [Type<T1>, Type<T2>]): Type<T1 & T2>;
-function mixture<T1 extends EmptyClass,
-  T2 extends EmptyClass = T1,
-  T3 extends EmptyClass = T2>(constructors: [Type<T1>, Type<T2>, Type<T3>]): Type<T1 & T2 & T3> {
-  class Mixin {
-  }
-
-  constructors.forEach((baseCtor) => {
-    Object.getOwnPropertyNames(baseCtor.prototype)
-      .filter(name => name !== 'constructor')
-      .forEach((name) => {
-        Object.defineProperty(
-          Mixin.prototype,
-          name,
-          Object.getOwnPropertyDescriptor(baseCtor.prototype, name) as PropertyDescriptor
-        );
-      });
-
-    for (const Constructor of constructors) {
-      if (Constructor.length > 0) {
-        continue;
-      }
-      const obj = new Constructor();
-      Object.getOwnPropertyNames(obj)
-        .forEach((name) => {
-          Object.defineProperty(
-            Mixin.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(obj, name) as PropertyDescriptor
-          );
-        });
-    }
-
-  });
-  return Mixin as any;
-}
-
-export class OnDestroy$ implements OnDestroy {
-  onDestroy$ = new Subject<void>();
-
-  ngOnDestroy(): void {
-    this.onDestroy$.next();
-    this.onDestroy$.complete();
-  }
-}
-
-export class OnInit$ implements OnInit {
-  onInit$ = new Subject<void>();
-
-  ngOnInit(): void {
-    this.onInit$.next();
-    this.onInit$.complete();
-  }
-}
-
-export class OnChange$ implements OnChanges {
-  onChanges$ = new Subject<SimpleChanges>();
-
-  ngOnChanges(changes: SimpleChanges): void {
-    this.onChanges$.next(changes);
-
-    for (const key of Object.keys(changes)) {
-      (this as unknown as Record<string, Subject<any>>)[key + `$`]
-        .next(changes[key].currentValue);
-    }
-  }
-}
-
-const mixtureClass = mixture<OnDestroy$, OnInit$, OnChange$>([OnDestroy$, OnInit$, OnChange$]);
-
-@Component({ selector: `any` })
-export class HappyClappyZack extends mixtureClass {
+@Component({ selector: `happy-clappy-zack`, template: `nada {{temp}}` })
+export class HappyClappyZack extends mixtureClass implements test {
 
   @Input() beardLength = 2;
   @Input() scratchingSeverity = 100;
 
   constructor() {
     super();
+
     // setup composition api
     this.goTiger();
     this.secondSon();
+    return Object.assign(this, {temp: 1});
   }
 
-  feat1() {
-  }
+  feat1 = () => {};
 
   cleanFeat1() {
   }
@@ -163,45 +101,30 @@ export class HappyClappyZack extends mixtureClass {
     // do anything you usually do in ngOnInit
     this.feat2();
 
-    this.beardLength$.subscribe((value) => this.scratchingSeverity += 20);
-
     this.onChanges$
       .pipe(filter((value: SimpleChanges) => 'beardLength' in value))
       .subscribe();
 
     type Properties = keyof HappyClappyZack;
-    function onChange<T1 extends Properties>(key: T1): void {
+    const onChange = <T1 extends Properties>(key: T1) => {
       return this.onChanges$
         .pipe(filter((value: SimpleChanges) => key in value));
-    }
+    };
 
-    onChange('scratchingSeverity', (value) => {} )
-    onChanges(['scratchingSeverity', 'beardLength'], (value) => {})
+    /*onChange('scratchingSeverity', (value) => {
+    });
+    onChanges(['scratchingSeverity', 'beardLength'], (value) => {
+    });
+*/
+    /*    this.computedValue = computed(() => this.beardLength * this.scratchingSeverity);
 
-    this.computedValue = computed(() => this.beardLength * this.scratchingSeverity);
-
-    combineLatest(this.beardLength$, this.scratchingSeverity$)
-      .subscribe((length, severity) => {
-        this.computedValue = length * severity;
-      });
+        combineLatest(this.beardLength$, this.scratchingSeverity$)
+          .subscribe((length, severity) => {
+            this.computedValue = length * severity;
+          });*/
 
     await this.onDestroy$.toPromise();
     // cleanup here
     this.cleanFeat2();
-  }
-}
-
-
-@Component({
-  selector: 'happy-mixture',
-  template: `
-    <button (click)="duck()">{{_duck}}</button>
-    <br/>
-    <button (click)="jump()">{{jumpy}}</button>
-  `
-})
-export class HappyMixtureComponent extends mixture<Jumpable, Duckable>([Jumpable, Duckable]) {
-  constructor() {
-    super();
   }
 }
