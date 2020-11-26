@@ -22,6 +22,14 @@ import { mixture } from '../ng-composition/pure-mixture';
 // 9. typeahead matching and highlight example
 // 10. expose properties\methods to template?
 // 11. computed properties
+// 12. multi inject functions -> typeahead matching
+// 13. samples carousel - timepicker - typeahead
+// 14. resolve autocomplete via Symbols
+
+
+// notes:
+// 1. You should not worry about Mixins, because if you use angalar/matireal
+// then you already use mixins https://github.com/angular/components/blob/master/src/material/autocomplete/autocomplete.ts
 
 // Steps:
 // 0. Perspective on component as an API and documentation for interactions:
@@ -36,27 +44,34 @@ import { mixture } from '../ng-composition/pure-mixture';
 // prefer
 // 1. use mixture for observable lifecycles
 // 2. inject features, use setup method to inject {props, methods, calculated properties}
-// 3. implement interfaces from features, to have properties, methods available in templates
+// ??? 3. implement interfaces from features, to have properties, methods available in templates
+// ??? 4. API for template as a class to mixture, access to name clashes via local Symbols.
+//      logic as a separate ?injectable? class
 
-const mixtureClass = mixture(OnDestroy$, OnInit$, OnChanges$);
-interface test {temp: number}
+class test {
+  temp = 0;
+}
+
+const lifecycles = mixture(OnDestroy$, OnInit$, OnChanges$);
+const base = mixture(test, lifecycles);
 
 @Component({ selector: `happy-clappy-zack`, template: `nada {{temp}}` })
-export class HappyClappyZack extends mixtureClass implements test {
+export class HappyClappyZack extends base {
 
   @Input() beardLength = 2;
   @Input() scratchingSeverity = 100;
 
   constructor() {
     super();
-
+    console.log(`constructor`);
     // setup composition api
     this.goTiger();
     this.secondSon();
-    return Object.assign(this, {temp: 1});
+    return Object.assign(this, { temp: 1 });
   }
 
-  feat1 = () => {};
+  feat1 = () => {
+  };
 
   cleanFeat1() {
   }
@@ -67,30 +82,17 @@ export class HappyClappyZack extends mixtureClass implements test {
   cleanFeat2() {
   }
 
-
-  // without composition API
-  // FIX: logic of feature is mixed in lifecycle hooks
-  ngOnInit() {
-    this.feat1();
-    this.feat2();
-  }
-
-  ngOnDestroy() {
-    this.feat1();
-    this.feat2();
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-  }
-
   // WITH composition API
   // logic are grouped per feature
   async goTiger(): Promise<void> {
+    console.log(`before init`);
     await this.onInit$.toPromise();
+    console.log(`after init`);
     // do anything you usually do in ngOnInit
     this.feat1();
-
+    console.log(`before destroy`);
     await this.onDestroy$.toPromise();
+    console.log(`after destroy`);
     // cleanup here
     this.cleanFeat2();
   }
