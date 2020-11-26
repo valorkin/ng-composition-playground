@@ -6,7 +6,7 @@ import { Subject } from 'rxjs';
 
 // read more at: https://angular.io/guide/lifecycle-hooks
 
-@Directive({selector: 'ne-nada-tak-OnChanges$'})
+@Directive()
 export class OnChanges$ implements OnChanges {
   onChanges$ = new Subject<SimpleChanges>();
 
@@ -15,7 +15,7 @@ export class OnChanges$ implements OnChanges {
   }
 }
 
-@Directive({selector: 'ne-nada-tak-OnInit$'})
+@Directive()
 export class OnInit$ implements OnInit {
   onInit$ = new Subject<void>();
 
@@ -25,7 +25,7 @@ export class OnInit$ implements OnInit {
   }
 }
 
-@Directive({selector: 'ne-nada-tak-DoCheck$'})
+@Directive()
 export class DoCheck$ implements DoCheck {
   doCheck$ = new Subject<void>();
 
@@ -34,7 +34,7 @@ export class DoCheck$ implements DoCheck {
   }
 }
 
-@Directive({selector: 'ne-nada-tak-AfterContentInit$'})
+@Directive()
 export class AfterContentInit$ implements AfterContentInit {
   afterContentInit$ = new Subject<void>();
 
@@ -44,7 +44,7 @@ export class AfterContentInit$ implements AfterContentInit {
   }
 }
 
-@Directive({selector: 'ne-nada-tak-AfterContentChecked$'})
+@Directive()
 export class AfterContentChecked$ implements AfterContentChecked {
   afterContentChecked$ = new Subject<void>();
 
@@ -53,7 +53,7 @@ export class AfterContentChecked$ implements AfterContentChecked {
   }
 }
 
-@Directive({selector: 'ne-nada-tak-AfterViewInit$'})
+@Directive()
 export class AfterViewInit$ implements AfterViewInit {
   afterViewInit$ = new Subject<void>();
 
@@ -63,7 +63,7 @@ export class AfterViewInit$ implements AfterViewInit {
   }
 }
 
-@Directive({selector: 'ne-nada-tak-AfterViewChecked$'})
+@Directive()
 export class AfterViewChecked$ implements AfterViewChecked {
   afterViewChecked$ = new Subject<void>();
 
@@ -72,7 +72,7 @@ export class AfterViewChecked$ implements AfterViewChecked {
   }
 }
 
-@Directive({selector: 'ne-nada-tak-OnDestroy$'})
+@Directive()
 export class OnDestroy$ implements OnDestroy {
   onDestroy$ = new Subject<void>();
 

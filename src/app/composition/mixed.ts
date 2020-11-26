@@ -4,6 +4,7 @@
 // This can live anywhere in your codebase:
 import { Component, Input, SimpleChanges } from '@angular/core';
 import { filter } from 'rxjs/operators';
+import { uniqueIdBase } from '../../../samples/02-split-by-feature/03-unique-prefix';
 import { OnChanges$, OnDestroy$, OnInit$ } from '../ng-composition/lifecycle';
 import { mixture } from '../ng-composition/pure-mixture';
 
@@ -12,7 +13,7 @@ import { mixture } from '../ng-composition/pure-mixture';
 // 2. watch | watchers
 // 3. this?
 // 4. convert onChange to key\value pairs?
-// 5* ignore Class is using Angular features but is not decorated. Please add an explicit Angular decorator.
+// 5* @Directive() ignore Class is using Angular features but is not decorated. Please add an explicit Angular decorator.
 // 6. inject parts via DI
 // 7. how to init all the things??? setup function
 // 7.1. child provides properties and methods without dependencies
@@ -53,11 +54,11 @@ class test {
 }
 
 const lifecycles = mixture(OnDestroy$, OnInit$, OnChanges$);
-const base = mixture(test, lifecycles);
+const base = mixture(test, uniqueIdBase(`happy-id-`), lifecycles);
 
-@Component({ selector: `happy-clappy-zack`, template: `nada {{temp}}` })
+@Component({ selector: `happy-clappy-zack`, template: `nada {{temp}} id: {{id}}` })
 export class HappyClappyZack extends base {
-
+  @Input() id: string
   @Input() beardLength = 2;
   @Input() scratchingSeverity = 100;
 
