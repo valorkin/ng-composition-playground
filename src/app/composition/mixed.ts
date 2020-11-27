@@ -29,7 +29,7 @@ import { mixture } from '../ng-composition/pure-mixture';
 
 
 // notes:
-// 1. You should not worry about Mixins, because if you use angalar/matireal
+// 1. You should not worry about Mixins, because if you use angular/matireal
 // then you already use mixins https://github.com/angular/components/blob/master/src/material/autocomplete/autocomplete.ts
 
 // Steps:
@@ -56,9 +56,12 @@ class test {
 const lifecycles = mixture(OnDestroy$, OnInit$, OnChanges$);
 const base = mixture(test, uniqueIdBase(`happy-id-`), lifecycles);
 
-@Component({ selector: `happy-clappy-zack`, template: `nada {{temp}} id: {{id}}` })
+@Component({
+  selector: `happy-clappy-zack`,
+  template: `nada {{temp}} id: {{id}}`,
+  inputs: ['id']
+})
 export class HappyClappyZack extends base {
-  @Input() id: string
   @Input() beardLength = 2;
   @Input() scratchingSeverity = 100;
 

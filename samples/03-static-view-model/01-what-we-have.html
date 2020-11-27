@@ -1,0 +1,34 @@
+<label [attr.for]="inputId" class="mat-checkbox-layout" #label>
+  <span class="mat-checkbox-inner-container"
+        [class.mat-checkbox-inner-container-no-side-margin]="!checkboxLabel.textContent || !checkboxLabel.textContent.trim()">
+    <input #input
+           class="mat-checkbox-input cdk-visually-hidden" type="checkbox"
+           [id]="inputId"
+           [required]="required"
+           [checked]="checked"
+           [attr.value]="value"
+           [disabled]="disabled"
+           [attr.name]="name"
+           [tabIndex]="tabIndex"
+           [attr.aria-label]="ariaLabel || null"
+           [attr.aria-labelledby]="ariaLabelledby"
+           [attr.aria-checked]="_getAriaChecked()"
+           [attr.aria-describedby]="ariaDescribedby"
+           (change)="_onInteractionEvent($event)"
+           (click)="_onInputClick($event)">
+    <span matRipple class="mat-checkbox-ripple mat-focus-indicator"
+          [matRippleTrigger]="label"
+          [matRippleDisabled]="_isRippleDisabled()"
+          [matRippleRadius]="20"
+          [matRippleCentered]="true"
+          [matRippleAnimation]="{enterDuration: 150}">
+      <span class="mat-ripple-element mat-checkbox-persistent-ripple"></span>
+
+    </span>
+  </span>
+  <span class="mat-checkbox-label" #checkboxLabel (cdkObserveContent)="_onLabelTextChange()">
+    <!-- Add an invisible span so JAWS can read the label -->
+    <span style="display:none">&nbsp;</span>
+    <ng-content></ng-content>
+  </span>
+</label>

@@ -1,0 +1,22 @@
+<!-- before -->
+<span class="mat-checkbox-inner-container"
+      [class.mat-checkbox-inner-container-no-side-margin]="!checkboxLabel.textContent || !checkboxLabel.textContent.trim()">
+    <input #input
+           [attr.aria-label]="ariaLabel || null"
+           [attr.aria-checked]="_getAriaChecked()">
+    <span matRipple class="mat-checkbox-ripple mat-focus-indicator"
+          [matRippleDisabled]="_isRippleDisabled()">
+    </span>
+  </span>
+
+<!-- after -->
+<span class="mat-checkbox-inner-container"
+      [class.mat-checkbox-inner-container-no-side-margin]="noSideMargin">
+    <input #input
+           [attr.aria-label]="ariaLabel"
+           [attr.aria-checked]="_getAriaChecked">
+    <span matRipple class="mat-checkbox-ripple mat-focus-indicator"
+          [matRippleDisabled]="_isRippleDisabled">
+    </span>
+  </span>
+

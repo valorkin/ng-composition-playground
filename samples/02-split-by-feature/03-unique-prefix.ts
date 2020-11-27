@@ -1,5 +1,4 @@
-import { Component, Directive, Input } from '@angular/core';
-import { mixture } from '../../src/app/ng-composition/pure-mixture';
+import { Directive, Input } from '@angular/core';
 
 let uniqueId = 1;
 
@@ -28,9 +27,4 @@ export function uniqueIdBase(prefix: string) {
     }
   });
   return UniqueId;
-}
-
-@Component({selector: `your-component`, template: ``})
-class ComponentWithUniqueId extends uniqueIdBase(`your-component-name`) {
-  @Input() fck: string;
 }
