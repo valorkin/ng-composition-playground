@@ -89,14 +89,10 @@ export class HappyClappyZack extends base {
   // WITH composition API
   // logic are grouped per feature
   async goTiger(): Promise<void> {
-    console.log(`before init`);
     await this.onInit$.toPromise();
-    console.log(`after init`);
     // do anything you usually do in ngOnInit
     this.feat1();
-    console.log(`before destroy`);
     await this.onDestroy$.toPromise();
-    console.log(`after destroy`);
     // cleanup here
     this.cleanFeat2();
   }
@@ -107,7 +103,7 @@ export class HappyClappyZack extends base {
     // do anything you usually do in ngOnInit
     this.feat2();
 
-    this.onChanges$
+    const beardSub = this.onChanges$
       .pipe(filter((value: SimpleChanges) => 'beardLength' in value))
       .subscribe();
 
@@ -131,6 +127,7 @@ export class HappyClappyZack extends base {
 
     await this.onDestroy$.toPromise();
     // cleanup here
+    beardSub.unsubscribe();
     this.cleanFeat2();
   }
 }

@@ -45,20 +45,7 @@ export class CheckboxUniqueId {
 
 /** ----------------------------------------------------------------------------------- */
 
-export class CheckboxTemplateProperties {
-  /** The native `<input type="checkbox">` element */
-  @ViewChild('input') _inputElement: ElementRef<HTMLInputElement>;
-
-  /** Reference to the ripple instance of the checkbox. */
-  @ViewChild(MatRipple) ripple: MatRipple;
-}
-
-/** ----------------------------------------------------------------------------------- */
-
 export class CheckboxValueAccessor implements ControlValueAccessor {
-  /** Whether the checkbox is checked. */
-  @Input() checked: boolean;
-
   /**
    * Whether the checkbox is disabled. This fully overrides the implementation provided by
    * mixinDisabled, but the mixin is still required because mixinTabIndex requires it.
@@ -96,7 +83,20 @@ export class CheckboxValueAccessor implements ControlValueAccessor {
 
 /** ----------------------------------------------------------------------------------- */
 
+export class CheckboxTemplateProperties {
+  /** The native `<input type="checkbox">` element */
+  @ViewChild('input') _inputElement: ElementRef<HTMLInputElement>;
+
+  /** Reference to the ripple instance of the checkbox. */
+  @ViewChild(MatRipple) ripple: MatRipple;
+}
+
+/** ----------------------------------------------------------------------------------- */
+
 export class CheckboxApi {
+  /** Whether the checkbox is checked. */
+  @Input() checked: boolean;
+
   /** The value attribute of the native input element */
   @Input() value: string;
 
