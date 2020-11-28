@@ -2,8 +2,10 @@
 // 1. Mixins inherit only methods and properties
 
 // This can live anywhere in your codebase:
-import { Component, Input, SimpleChanges } from '@angular/core';
-import { filter } from 'rxjs/operators';
+import { Component, Injectable, Injector, Input, SimpleChanges } from '@angular/core';
+import { Observable } from 'rxjs';
+import { fromArray } from 'rxjs/internal/observable/fromArray';
+import { distinctUntilChanged, filter, map, takeUntil, tap } from 'rxjs/operators';
 import { uniqueIdBase } from '../../../samples/02-split-by-feature/03-unique-prefix';
 import { OnChanges$, OnDestroy$, OnInit$ } from '../ng-composition/lifecycle';
 import { mixture } from '../ng-composition/pure-mixture';
@@ -48,27 +50,72 @@ import { mixture } from '../ng-composition/pure-mixture';
 // ??? 3. implement interfaces from features, to have properties, methods available in templates
 // ??? 4. API for template as a class to mixture, access to name clashes via local Symbols.
 //      logic as a separate ?injectable? class
-
-class test {
+@Injectable({ providedIn: 'any' })
+class TestService {
   temp = 0;
+
+  fetch(): Observable<number> {
+    return fromArray([1, 2, 3, 4]);
+  }
 }
 
 const lifecycles = mixture(OnDestroy$, OnInit$, OnChanges$);
-const base = mixture(test, uniqueIdBase(`happy-id-`), lifecycles);
+const MixinsBase = mixture(uniqueIdBase(`unique-id-`), lifecycles);
 
-@Component({
-  selector: `happy-clappy-zack`,
-  template: `nada {{temp}} id: {{id}}`,
-  inputs: ['id']
-})
-export class HappyClappyZack extends base {
+@Component({selector: `based-on-mixins`, template: ``})
+export class BasedOnMixture extends MixinsBase {
+
+
+
   @Input() beardLength = 2;
   @Input() scratchingSeverity = 100;
+  computed = 0;
+  test = 'test';
 
-  constructor() {
+  constructor(private readonly injector: Injector) {
     super();
-    console.log(`constructor`);
+    // todo:
+    // 1. bind to properties
+    // 2. watch inputs -> calculated
+    // ?. on set?
+
+
+    onChange(this, 'beardLength', value => this.scratchingSeverity += value);
+    onChanges(this, ['beardLength', 'scratchingSeverity'],
+      (values => this.computed = values.beardLength * values.scratchingSeverity ));
+
+
+    function onChange<T extends OnChanges$ & OnDestroy$, K extends keyof T>(
+      comp: T, key: K, fn: (value: T[K]) => void, _markForCheck = false) {
+      return comp.onChanges$
+        .pipe(
+          takeUntil(comp.onDestroy$),
+          filter(value => !!value[key as string]),
+          map((values: SimpleChanges) => values[key as string]?.currentValue),
+          distinctUntilChanged(),
+          tap(value => {
+            if (fn) {
+              fn(value);
+            }
+            if (_markForCheck) {
+              markForCheck();
+            }
+          })
+        );
+    }
+
+    function onChanges<T extends OnChanges$ & OnDestroy$, K extends keyof T>(
+      comp: T, key: Array<K>, fn: (values: {[Z in keyof T]: T[K]}) => void, _markForCheck = false) {
+      return 'TODO';
+    }
+
+    function markForCheck(){}
+
+    // setup(this, test, {fetched: test.fetch};
     // setup composition api
+    function setup<T, K>(that: T, provider: K, props: Partial<{ [Z in keyof T]: Observable<T[Z]> }>) {
+    }
+
     this.goTiger();
     this.secondSon();
     return Object.assign(this, { temp: 1 });
@@ -107,7 +154,7 @@ export class HappyClappyZack extends base {
       .pipe(filter((value: SimpleChanges) => 'beardLength' in value))
       .subscribe();
 
-    type Properties = keyof HappyClappyZack;
+    type Properties = keyof BasedOnMixture;
     const onChange = <T1 extends Properties>(key: T1) => {
       return this.onChanges$
         .pipe(filter((value: SimpleChanges) => key in value));

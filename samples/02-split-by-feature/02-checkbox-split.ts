@@ -16,6 +16,15 @@ const ariaHtml = `
 
 /** ----------------------------------------------------------------------------------- */
 
+export class CheckboxUniqueId {
+  private _uniqueId: string = `mat-checkbox-${++nextUniqueId}`;
+
+  /** A unique id for the checkbox input. If none is supplied, it will be auto-generated. */
+  @Input() id: string = this._uniqueId;
+}
+
+/** ----------------------------------------------------------------------------------- */
+
 export class CheckboxAriaApi {
   /**
    * Attached to the aria-label attribute of the host element. In most cases, aria-labelledby will
@@ -30,28 +39,11 @@ export class CheckboxAriaApi {
 
   /** The 'aria-describedby' attribute is read after the element's label and field type. */
   @Input('aria-describedby') ariaDescribedby: string;
-
-  isAriaChecked: 'true' | 'false' | 'mixed';
 }
 
 /** ----------------------------------------------------------------------------------- */
 
-export class CheckboxUniqueId {
-  private _uniqueId: string = `mat-checkbox-${++nextUniqueId}`;
-
-  /** A unique id for the checkbox input. If none is supplied, it will be auto-generated. */
-  @Input() id: string = this._uniqueId;
-}
-
-/** ----------------------------------------------------------------------------------- */
-
-export class CheckboxValueAccessor implements ControlValueAccessor {
-  /**
-   * Whether the checkbox is disabled. This fully overrides the implementation provided by
-   * mixinDisabled, but the mixin is still required because mixinTabIndex requires it.
-   */
-  @Input() disabled: boolean;
-
+export abstract class CheckboxValueAccessor implements ControlValueAccessor {
   private _controlValueAccessorChangeFn: (value: any) => void = () => {};
 
   /**
@@ -83,17 +75,13 @@ export class CheckboxValueAccessor implements ControlValueAccessor {
 
 /** ----------------------------------------------------------------------------------- */
 
-export class CheckboxTemplateProperties {
-  /** The native `<input type="checkbox">` element */
-  @ViewChild('input') _inputElement: ElementRef<HTMLInputElement>;
+export class CheckboxInputApi {
+  /** Name value will be applied to the input element if present */
+  @Input() name: string | null = null;
 
-  /** Reference to the ripple instance of the checkbox. */
-  @ViewChild(MatRipple) ripple: MatRipple;
-}
+  /** Whether the checkbox is required. */
+  @Input() required: boolean;
 
-/** ----------------------------------------------------------------------------------- */
-
-export class CheckboxApi {
   /** Whether the checkbox is checked. */
   @Input() checked: boolean;
 
@@ -108,6 +96,16 @@ export class CheckboxApi {
    */
   @Input() indeterminate: boolean;
 
+  /**
+   * Whether the checkbox is disabled. This fully overrides the implementation provided by
+   * mixinDisabled, but the mixin is still required because mixinTabIndex requires it.
+   */
+  @Input() disabled: boolean;
+}
+
+/** ----------------------------------------------------------------------------------- */
+
+export class CheckboxApi {
   /** Whether the label should appear after or before the checkbox. Defaults to 'after' */
   @Input() labelPosition: 'before' | 'after' = 'after';
 
@@ -117,12 +115,18 @@ export class CheckboxApi {
 
   /** Event emitted when the checkbox's `indeterminate` value changes. */
   @Output() readonly indeterminateChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+}
 
-  /** Name value will be applied to the input element if present */
-  @Input() name: string | null = null;
+/** ----------------------------------------------------------------------------------- */
 
-  /** Whether the checkbox is required. */
-  @Input() required: boolean;
+export class CheckboxTemplateProperties {
+  isAriaChecked: 'true' | 'false' | 'mixed';
+
+  /** The native `<input type="checkbox">` element */
+  @ViewChild('input') _inputElement: ElementRef<HTMLInputElement>;
+
+  /** Reference to the ripple instance of the checkbox. */
+  @ViewChild(MatRipple) ripple: MatRipple;
 }
 
 /** ----------------------------------------------------------------------------------- */
