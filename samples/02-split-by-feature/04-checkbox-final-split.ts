@@ -2,13 +2,13 @@ import { Component } from '@angular/core';
 import { mixture } from '../../src/app/ng-composition/pure-mixture';
 import {
   CheckboxApi,
-  CheckboxAriaApi,
+  CheckboxAriaApi, CheckboxInputApi,
   CheckboxTemplateProperties,
   CheckboxUniqueId,
   CheckboxValueAccessor
 } from './02-checkbox-split';
 
-const CheckboxBase = mixture(CheckboxApi, CheckboxValueAccessor, CheckboxTemplateProperties, CheckboxUniqueId, CheckboxAriaApi);
+const CheckboxBase = mixture(CheckboxApi, CheckboxValueAccessor, CheckboxInputApi, CheckboxTemplateProperties, CheckboxUniqueId, CheckboxAriaApi);
 
 
 function one() {

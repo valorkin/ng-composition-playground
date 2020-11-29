@@ -49,6 +49,8 @@ import {
   mixinTabIndex,
 } from '@angular/material/core';
 import {ANIMATION_MODULE_TYPE} from '@angular/platform-browser/animations';
+import { AfterViewInit$, OnDestroy$ } from '../../src/app/ng-composition/lifecycle';
+import { mixture } from '../../src/app/ng-composition/pure-mixture';
 
 
 
@@ -94,8 +96,10 @@ export class MatCheckboxChange {
 
 // Boilerplate for applying mixins to MatCheckbox.
 /** @docs-private */
-class MatCheckboxBase {
-  constructor(public _elementRef: ElementRef) {}
+class MatCheckboxBase extends mixture(AfterViewInit$, OnDestroy$) {
+  constructor(public _elementRef: ElementRef) {
+    super();
+  }
 }
 const _MatCheckboxMixinBase:
   HasTabIndexCtor &
@@ -211,7 +215,7 @@ export class MatCheckbox extends _MatCheckboxMixinBase implements ControlValueAc
     super(elementRef);
     this._options = this._options || defaults;
     this.color = this.defaultColor = this._options.color || defaults.color;
-    this.tabIndex = parseInt(tabIndex) || 0;
+    this.tabIndex = parseInt(tabIndex, 10) || 0;
   }
 
   ngAfterViewInit() {

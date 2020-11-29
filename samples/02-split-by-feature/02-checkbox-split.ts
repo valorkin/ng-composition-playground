@@ -43,7 +43,8 @@ export class CheckboxAriaApi {
 
 /** ----------------------------------------------------------------------------------- */
 
-export abstract class CheckboxValueAccessor implements ControlValueAccessor {
+export class CheckboxValueAccessor implements ControlValueAccessor {
+
   private _controlValueAccessorChangeFn: (value: any) => void = () => {};
 
   /**
