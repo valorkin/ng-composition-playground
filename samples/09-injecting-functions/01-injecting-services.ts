@@ -3,7 +3,7 @@
 // there are several main reasons to have methods in component to reevaluate it`s state/trigger events
 // 1. allow a user to trigger an action from component's template
 // 2. react to a change of an input(s)
-// 3. react to a change in template
+// 3. react to a property change in template
 
 // Bind properties?
 // where to store methods definitions?
@@ -13,11 +13,12 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 /** // 1. allow a user to trigger an action from component's template */
 import { Component, Directive, Input } from '@angular/core';
+import { Subject } from 'rxjs';
 
 function case1() {
 
   class SampleService {
-    open(comp: Component) {
+    open(comp) {
     }
 
     close(compRef) {
@@ -25,18 +26,22 @@ function case1() {
   }
 
 // for 1 -> setup function
-  function setup(service: SampleService) {
-    bindMethods(this, {
-      open: () => service.open(this),
-      close: () => service.close(this)
-    });
+
+  @Component({selector: '', template: ''})
+  class BindMethods {
+
+    setup(service: SampleService) {
+      bindMethods(this, {
+        open: () => service.open(this),
+        close: () => service.close(this)
+      });
+    }
+
   }
 
   /** *********************************** */
   function bindMethods(a: any, b: any) {
   }
-
-  setup(new SampleService());
 }
 
 /** // 2. react to a change of an input(s) */
@@ -61,20 +66,73 @@ function case2() {
 
     private _required: boolean;
 
+    /** *********************************** */
 
     /** Returns the unique id for the visual hidden input. */
-    get inputId(): string { return `${this.id || this._uniqueId}-input`; }
+    get inputId(): string {
+      return `${this.id || this._uniqueId}-input`;
+    }
+
+    id: number;
+    _uniqueId: number;
   }
 
   function setup() {
     onSet(this, {
       required: (value) => coerceBooleanProperty(value),
+      // OR short form
       disabled: coerceBooleanProperty
     });
   }
 
-  function onSet(a: any, b: any) {
+  function onSet(a: any, props: any) {
   }
 
+}
 
+
+// case 3
+// 1. binding Observable to static property
+// 2. binding Observable to static property which depends on 2nd property
+
+function case3() {
+  function fetch(value: number): Subject<number> {
+    return new Subject<number>();
+  }
+
+  class BindSample {
+    staticProperty: number;
+
+    setup() {
+      bindProperty$(this, 'staticProperty', fetch);
+    }
+
+    id: number;
+
+    setup2() {
+
+      onSet(this, {
+        id: (id) => bindProperty$(this, 'staticProperty', fetch(id)),
+      });
+
+      onSet(this, {
+        id: (id) => bindProperties$(this, fetch(id), (req) => ({
+          isLoading: req.isLoading,
+          error: req.error,
+          staticProperty: req?.result
+        })),
+      });
+
+
+    }
+  }
+
+  function bindProperty$(a: any, prop: any, c: any) {
+  }
+
+  function bindProperties$(a: any, prop: any, res: any) {
+  }
+
+  function onSet(a: any, props: any, c?: any) {
+  }
 }

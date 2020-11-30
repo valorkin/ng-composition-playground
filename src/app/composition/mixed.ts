@@ -15,7 +15,7 @@ import {
   SimpleChanges,
   Type
 } from '@angular/core';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { fromArray } from 'rxjs/internal/observable/fromArray';
 import { distinctUntilChanged, filter, map, takeUntil, tap } from 'rxjs/operators';
 import { uniqueIdBase } from '../../../samples/02-split-by-feature/03-unique-prefix';
@@ -92,11 +92,6 @@ export class BasedOnMixture extends MixinsBase {
 
   constructor(@Inject(TEST_TOKEN) private readonly service: TestService, renderer: Renderer2) {
     super();
-    // todo:
-    // 1. bind to properties
-    // 2. watch inputs -> calculated
-    // ?. on set?
-
 
     onChange(this, 'beardLength', value => this.scratchingSeverity += value);
     onChanges(this, ['beardLength', 'scratchingSeverity'],
@@ -111,10 +106,12 @@ export class BasedOnMixture extends MixinsBase {
           filter(value => !!value[key as string]),
           map((values: SimpleChanges) => values[key as string]?.currentValue),
           distinctUntilChanged(),
-          tap(value => {
+          map(value => {
             if (fn) {
-              fn(value);
+              return fn(value);
             }
+          }),
+          tap(() => {
             if (_markForCheck) {
               markForCheck();
             }
