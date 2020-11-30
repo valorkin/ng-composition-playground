@@ -2,7 +2,19 @@
 // 1. Mixins inherit only methods and properties
 
 // This can live anywhere in your codebase:
-import { Component, Injectable, Injector, Input, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Inject,
+  inject,
+  Injectable,
+  InjectionToken,
+  Injector,
+  Input,
+  Renderer2,
+  RendererFactory2,
+  SimpleChanges,
+  Type
+} from '@angular/core';
 import { Observable } from 'rxjs';
 import { fromArray } from 'rxjs/internal/observable/fromArray';
 import { distinctUntilChanged, filter, map, takeUntil, tap } from 'rxjs/operators';
@@ -54,6 +66,10 @@ import { mixture } from '../ng-composition/pure-mixture';
 class TestService {
   temp = 0;
 
+  constructor(renderer: Renderer2) {
+    console.log(renderer);
+  }
+
   fetch(): Observable<number> {
     return fromArray([1, 2, 3, 4]);
   }
@@ -62,17 +78,19 @@ class TestService {
 const lifecycles = mixture(OnDestroy$, OnInit$, OnChanges$);
 const MixinsBase = mixture(uniqueIdBase(`unique-id-`), lifecycles);
 
-@Component({selector: `based-on-mixins`, template: ``})
+export const TEST_TOKEN = new InjectionToken<TestService>('test toke', {
+  providedIn: 'any',
+  factory: () => new TestService(inject(RendererFactory2 as Type<RendererFactory2>).createRenderer(null, null))
+})
+
+@Component({selector: `based-on-mixins`, template: `my {{id}}`})
 export class BasedOnMixture extends MixinsBase {
-
-
-
   @Input() beardLength = 2;
   @Input() scratchingSeverity = 100;
   computed = 0;
   test = 'test';
 
-  constructor(private readonly injector: Injector) {
+  constructor(@Inject(TEST_TOKEN) private readonly service: TestService, renderer: Renderer2) {
     super();
     // todo:
     // 1. bind to properties

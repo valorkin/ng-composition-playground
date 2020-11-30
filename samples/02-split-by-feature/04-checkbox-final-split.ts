@@ -8,21 +8,17 @@ import {
   CheckboxValueAccessor
 } from './02-checkbox-split';
 
-const CheckboxBase = mixture(CheckboxApi, CheckboxValueAccessor, CheckboxInputApi, CheckboxTemplateProperties, CheckboxUniqueId, CheckboxAriaApi);
+const CheckboxBase = mixture(CheckboxApi, CheckboxValueAccessor, CheckboxInputApi,
+  CheckboxTemplateProperties, CheckboxUniqueId, CheckboxAriaApi);
 
-
-function one() {
-
-  @Component({selector: 'mat-checkbox', template: 'some material template'})
-  export class CheckboxComponent extends CheckboxBase {
-  }
-
+@Component({ selector: 'mat-checkbox', template: 'some material template' })
+export class CheckboxComponent extends CheckboxBase {
 }
 
 
 function two() {
 
-  @Component({selector: 'bootstrap-checkbox', template: ''})
+  @Component({ selector: 'bootstrap-checkbox', template: '' })
   export class CheckboxComponent extends CheckboxBase {
 
   }
