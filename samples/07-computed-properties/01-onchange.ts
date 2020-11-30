@@ -1,6 +1,8 @@
 // NOTES
 // 1. Mixins inherit only methods and properties
 
+import { setup } from '@angular-devkit/build-angular/src/utils/process-bundle';
+import { coerceBooleanProperty, coerceNumberProperty } from '@angular/cdk/coercion';
 // This can live anywhere in your codebase:
 import { Component, Directive, Injectable, Injector, Input, SimpleChanges } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -19,8 +21,13 @@ export class OnChangesSample extends base {
 
   constructor() {
     super();
+  }
+
+  setup() {
+    onChange(this, 'beardLength', coerceNumberProperty);
 
     onChange(this, 'beardLength', value => this.scratchingSeverity += value);
+
     onChanges(this, ['beardLength', 'scratchingSeverity'],
       (values => this.computed = values.beardLength * values.scratchingSeverity));
   }
